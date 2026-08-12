@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">📊 Dashboard</h1>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">💰 Total Accounts</div>
+                    <div class="card-body">
+                        <h2 class="card-title">{{ accounts|length }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">🏦 Total Balance</div>
+                    <div class="card-body">
+                        {% set total = namespace(value=0) %}
+                        {% for acc in accounts %}
+                        {% set total.value = total.value + acc.get_balance() %}
+                        {% endfor %}
+                        <h2 class="card-title">₹{{ "%.2f"|format(total.value) }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">📋 Total Transactions</div>
+                    <div class="card-body">
+                        {% set count = namespace(value=0) %}
+                        {% for acc in accounts %}
+                        {% set count.value = count.value + acc.get_transaction_history()|length %}
+                        {% endfor %}
+                        <h2 class="card-title">{{ count.value }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">📋 All Accounts</h5>
+            </div>
+            <div class="card-body">
+                {% if accounts %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Account Number</th>
+                                <th>Holder Name</th>
+                                <th>Type</th>
+                                <th>Balance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for acc in accounts %}
+                            <tr>
+                                <td><code>{{ acc.acc_number }}</code></td>
+                                <td>{{ acc.holder_name }}</td>
+                                <td>
+                                    {% if acc.__class__.__name__ == 'SavingAccount' %}
+                                    <span class="badge bg-success">Saving</span>
+                                    {% else %}
+                                    <span class="badge bg-warning" style="color: #0d1117;">Current</span>
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ "%.2f"|format(acc.get_balance()) }}</td>
+                                <td>
+                                    <a href="{{ url_for('account_details', acc_number=acc.acc_number) }}"
+                                        class="btn btn-sm btn-primary">View</a>
+                                    <a href="{{ url_for('transactions', acc_number=acc.acc_number) }}"
+                                        class="btn btn-sm btn-warning">History</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No accounts found. Create one now!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
