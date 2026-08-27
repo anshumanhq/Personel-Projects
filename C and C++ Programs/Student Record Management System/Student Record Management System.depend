@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1786555193 source:c:\github-anshumanhq\personel-projects\c and c++ programs\student record management system\app.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
